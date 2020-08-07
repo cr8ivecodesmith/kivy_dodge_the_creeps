@@ -1,0 +1,52 @@
+#:kivy 1.11.0
+
+#:include player.kv
+#:include mob.kv
+
+#:import DodgeGame game.DodgeGame
+#:import DodgeMobs mobs.DodgeMobs
+#:import Keyboard common.keyboard.Keyboard
+#:import RuntimeStats common.runtime_stats.RuntimeStats
+#:import Timer common.timer.Timer
+
+<DodgeGame>:
+
+    DodgePlayer:
+        id: player
+        visible: True
+        pos: root.width / 2 - 30, root.height / 2 - 30
+        speed: 60
+        on_hit: self.parent.game_over()
+
+    DodgeMobs:
+        id: mobs
+
+    Keyboard:
+        id: keyboard
+        on_key_press: player.on_key_press()
+        on_key_hold: player.on_key_hold()
+        on_key_release: player.on_key_release()
+
+    Timer:
+        id: start_timer
+        delay: 2
+        oneshot: True
+        on_timeout: self.parent.start_timer_timeout()
+
+    Timer:
+        id: score_timer
+        delay: 1
+        on_timeout: self.parent.score_timer_timeout()
+
+    Timer:
+        id: mob_timer
+        delay: 0.5
+        on_timeout: self.parent.mob_timer_timeout()
+
+    Timer:
+        id: mob_move_timer
+        delay: 1 / 24
+        on_timeout: self.parent.mob_move_timeout()
+
+    RuntimeStats:
+        show: True

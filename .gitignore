@@ -1,0 +1,7 @@
+*.py[cod]
+__pycache__
+*.swp
+*~
+*.log
+.DS_Store
+.python-version

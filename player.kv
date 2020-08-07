@@ -1,0 +1,15 @@
+#:include common/sprite.kv
+#
+#:import DodgePlayer player.DodgePlayer
+#:import AnimatedSprite common.sprite.AnimatedSprite
+
+<DodgePlayer>:
+
+    AnimatedSprite:
+        id: sprite
+        pos: self.parent.pos
+        sprite_map: 'dodge_assets/art/player.atlas'
+        animations: ['walk', 'up']
+        animation: 'walk'
+        scale_hint: 0.5
+        animation_speed: 5

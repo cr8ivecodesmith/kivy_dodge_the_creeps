@@ -1,0 +1,16 @@
+#:include common/sprite.kv
+#
+#:import choice random.choice
+#:import DodgeMob mob.DodgeMob
+#:import AnimatedSprite common.sprite.AnimatedSprite
+
+<DodgeMob>:
+
+    AnimatedSprite:
+        id: sprite
+        pos: self.parent.pos
+        sprite_map: 'dodge_assets/art/enemy.atlas'
+        animations: ['walking', 'flying', 'swimming']
+        animation: choice(['walking', 'flying', 'swimming'])
+        scale_hint: .6
+        animation_speed: 5
