@@ -1,10 +1,12 @@
 #:include common/sprite.kv
-#
+
 #:import choice random.choice
 #:import DodgeMob mob.DodgeMob
 #:import AnimatedSprite common.sprite.AnimatedSprite
 
 <DodgeMob>:
+
+    neutral_groups: ('mobs',)
 
     AnimatedSprite:
         id: sprite

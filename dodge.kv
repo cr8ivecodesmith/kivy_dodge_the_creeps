@@ -5,7 +5,10 @@
 
 #:import DodgeGame game.DodgeGame
 #:import DodgeMobs mobs.DodgeMobs
+
+#:import CollisionSystem common.collision.CollisionSystem
 #:import Keyboard common.keyboard.Keyboard
+#:import Path2D common.path2d.Path2D
 #:import RuntimeStats common.runtime_stats.RuntimeStats
 #:import Timer common.timer.Timer
 
@@ -15,17 +18,20 @@
         id: player
         visible: True
         pos: root.width / 2 - 30, root.height / 2 - 30
-        speed: 60
+        speed: 420
+        on_body_entered: self.handle_body_entered(*args)
         on_hit: self.parent.game_over()
 
     DodgeMobs:
         id: mobs
 
+    Path2D:
+        id: mob_path
+
     Keyboard:
         id: keyboard
-        on_key_press: player.on_key_press()
-        on_key_hold: player.on_key_hold()
         on_key_release: player.on_key_release()
+        on_key_press: player.on_key_press()
 
     Timer:
         id: start_timer
@@ -43,10 +49,28 @@
         delay: 0.5
         on_timeout: self.parent.mob_timer_timeout()
 
+    # ============
+    # GAME SYSTEMS
+    # ============
+    # General systems
+
+    CollisionSystem:
+        id: collision_system
+
+    # ==============
+    # GAMELOOP TIMER
+    # ==============
+    # Timers to centralize data processors.
+    # Nodes or Systems with `process` methods that needs to be ran on every
+    # frame must bind to this timer.
+
     Timer:
-        id: mob_move_timer
-        delay: 1 / 24
-        on_timeout: self.parent.mob_move_timeout()
+        id: processor
+        delay: 1 / 60
+        autoplay: True
+        on_timeout: player.process(self.delta)
+        on_timeout: mob_path.process(self.delta)
+        on_timeout: collision_system.process(self.delta)
 
     RuntimeStats:
         show: True

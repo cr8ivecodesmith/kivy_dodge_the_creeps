@@ -1,25 +1,34 @@
+from random import randint
+
 from kivy.properties import (
     AliasProperty,
     NumericProperty,
 )
-from common.widget import Widget
+from common.node import Node
 
 
-class DodgeMob(Widget):
+class DodgeMob(Node):
 
-    speed = NumericProperty(20)
+    min_speed = NumericProperty(150)
+    max_speed = NumericProperty(350)
 
     def _get_sprite(self):
         return self.ids.get('sprite')
     sprite = AliasProperty(_get_sprite, None)
 
-    def _get_size(self):
-        return self.sprite.size
+    def _get_size(self): return self.sprite.size
 
-    def _set_size(self, val):
-        pass
+    def _set_size(self, val): pass
 
     size = AliasProperty(_get_size, _set_size)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.speed = randint(self.min_speed, self.max_speed)
+        self.bind(
+            min_speed=self.handle_speed,
+            max_speed=self.handle_speed,
+        )
+
+    def handle_speed(self, *args):
+        self.speed = randint(self.min_speed, self.max_speed)

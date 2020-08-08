@@ -2,7 +2,8 @@
 Mobs Generator
 
 """
-from common.widget import Widget
+from kivy.uix.widget import Widget
+
 from mob import DodgeMob
 
 

@@ -20,7 +20,6 @@ NOTES
   directly to the Window
 
 """  # noqa
-from kivy.clock import Clock
 from kivy.logger import Logger as log
 from kivy.properties import (
     AliasProperty,
@@ -28,11 +27,11 @@ from kivy.properties import (
 )
 from kivy.vector import Vector
 
-from common.widget import Widget
-from common.utils import clamp, dist, frame_offset
+from common.node import Node
+from common.utils import clamp
 
 
-class DodgePlayer(Widget):
+class DodgePlayer(Node):
 
     speed = NumericProperty(20)
 
@@ -54,113 +53,59 @@ class DodgePlayer(Widget):
         super().__init__(**kwargs)
         self.register_event_type('on_hit')
 
+        self.up_keys = ('up', 'k', 'w',)
+        self.down_keys = ('down', 'j', 's',)
+        self.left_keys = ('left', 'h', 'a',)
+        self.right_keys = ('right', 'l', 'd',)
+
     def on_hit(self): pass
 
-    def start(self, pos):
-        self.pos = pos
-        self.visible = True
-
-    def on_touch_down(self, touch):
-        # TODO:
-        # Call the process_movement repeatedly
-        # Until you reach the destination.
-        sprite = self.sprite
-        speed = self.speed
-
-        destination = Vector(touch.pos)
-        current = Vector(sprite.center)
-        distance = dist(current, destination)
-        direction = destination - current
-
-        self.process_movement(direction=direction)
-
-    def on_touch_up(self, touch):
-        Clock.schedule_once(lambda dt: self.sprite.stop(), 0.6)
+    def handle_body_entered(self, *args):
+        log.debug(f'PLAYER: I am hit! {args}')
+        self.dispatch('on_hit')
+        return True
 
     def on_key_release(self):
         sprite = self.ids['sprite']
         sprite.stop()
 
     def on_key_press(self):
-        key_str = self.keyboard.keycode[1]
-        if key_str == 'escape':
+        kb = self.keyboard
+        if kb.is_key_pressed('escape'):
             log.debug('KEYBOARD: Released')
+            kb.release()
             log.info('KEYBOARD: Press ESC again to exit')
-            self.keyboard.release()
 
-        log.debug(f'KEYBOARD: Pressed ({key_str})')
-        self.process_movement(key_str=key_str)
-
-    def on_key_hold(self):
-        key_str = self.keyboard.keycode[1]
-        log.debug(f'KEYBOARD: Holding ({key_str})')
-
-    def _direction_key_str(self, direction):
-        # TODO:
-        # - Consider a variance value for absolute l,r,u,d movement
-        key_str = ''
-        if direction.x == 0 and direction.y > 0:
-            key_str = 'up'
-        elif direction.x == 0 and direction.y < 0:
-            key_str = 'down'
-        elif direction.y == 0 and direction.x > 0:
-            key_str = 'right'
-        elif direction.y == 0 and direction.x < 0:
-            key_str = 'left'
-        elif direction.y > 0 and direction.x < 0:
-            key_str = 'y'
-        elif direction.y > 0 and direction.x > 0:
-            key_str = 'u'
-        elif direction.y < 0 and direction.x < 0:
-            key_str = 'b'
-        elif direction.y < 0 and direction.x > 0:
-            key_str = 'n'
-        return key_str
-
-    def get_velocity(self, key_str=None, direction=None):
+    def get_velocity(self):
         velocity = Vector(0, 0)
-
-        if direction and not key_str:
-            key_str = self._direction_key_str(direction)
-
-        if key_str == 'up' or key_str == 'k':
+        kb = self.keyboard
+        if kb.is_key_pressed(self.up_keys) or kb.is_key_down(self.up_keys):
             velocity.y += 1
-        elif key_str == 'down' or key_str == 'j':
+        if kb.is_key_pressed(self.down_keys) or kb.is_key_down(self.down_keys):
             velocity.y -= 1
-        elif key_str == 'left' or key_str == 'h':
+        if kb.is_key_pressed(self.left_keys) or kb.is_key_down(self.left_keys):
             velocity.x -= 1
-        elif key_str == 'right' or key_str == 'l':
+        if (
+            kb.is_key_pressed(self.right_keys)
+            or kb.is_key_down(self.right_keys)
+        ):
             velocity.x += 1
-
-        elif key_str == 'y':
-            velocity.y += 1
-            velocity.x -= 1
-        elif key_str == 'u':
-            velocity.y += 1
-            velocity.x += 1
-        elif key_str == 'b':
-            velocity.y -= 1
-            velocity.x -= 1
-        elif key_str == 'n':
-            velocity.y -= 1
-            velocity.x += 1
-
         return velocity
 
-    def process_movement(self, key_str=None, direction=None):
+    def process(self, delta):
         if not self.visible:
             return
 
         # Process movement
         sprite = self.sprite
-        velocity = self.get_velocity(key_str=key_str, direction=direction)
+        velocity = self.get_velocity()
 
         if velocity.length() > 0:
             # Play animation
             velocity = velocity.normalize() * self.speed
             sprite.play()
 
-        new_pos = Vector(self.pos) + (velocity * frame_offset())
+        new_pos = Vector(self.pos) + velocity * delta
         self.pos = (
             clamp(new_pos.x, 0, self.parent.width - sprite.width),
             clamp(new_pos.y, 0, self.parent.height - sprite.height),
@@ -171,13 +116,7 @@ class DodgePlayer(Widget):
             sprite.animation = 'walk'
             sprite.flip_v = False
             sprite.flip_h = velocity.x < 0
-            # sprite.angle += 10
 
         if velocity.y != 0:
             sprite.animation = 'up'
             sprite.flip_v = velocity.y < 0
-            # sprite.angle -= 10
-
-    def collide_widget(self, other):
-        super().collide_widget(other)
-        log.debug('PLAYER: I got hit!!!!')
