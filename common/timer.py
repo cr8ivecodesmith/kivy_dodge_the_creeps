@@ -22,28 +22,27 @@ class Timer(Widget):
         self.register_event_type('on_timeout')
         self.bind(autoplay=self.start)
 
-        self._started = False
         self._clock = None
         self._scheduler = getattr(
             Clock, 'schedule_once' if self.oneshot else 'schedule_interval'
         )
+        self.delta = 0.
 
     def on_timeout(self):
         pass
 
     def start(self, *args):
-        if self._started:
+        if self._clock and self._clock.is_triggered:
             return
         if not self._clock:
             self._clock = self._scheduler(self._tick, self.delay)
         else:
             self._clock()
-        self._started = True
 
     def stop(self):
         if self._clock:
             self._clock.cancel()
-            self._started = False
 
     def _tick(self, dt):
+        self.delta = dt
         self.dispatch('on_timeout')
