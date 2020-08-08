@@ -138,9 +138,12 @@ class AnimatedSprite(Sprite):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        # FPS Timer Offset
+        self._time = .0
+        self._rate = 1 / 60
+
         # Animation rate controls
         self._clock = None
-        self._started = False
         self._animation_speed = .25
         self._max_frames = 1
         self._frame = 1
@@ -176,14 +179,12 @@ class AnimatedSprite(Sprite):
 
     def handle_animation_speed(self, this, value):
         self._animation_speed = 1 / value
-
-        was_started = True if self._started else False
-        if was_started:
+        if self._clock and self._clock.is_triggered:
             self.stop()
             self.play()
 
     def play(self, *args):
-        if self._started:
+        if self._clock and self._clock.is_triggered:
             return
         if not self._clock:
             self._clock = Clock.schedule_interval(
@@ -191,34 +192,31 @@ class AnimatedSprite(Sprite):
             )
         else:
             self._clock()
-        self._started = True
 
     def stop(self):
         if self._clock:
             self._clock.cancel()
-            self._started = False
 
     def _animate(self, dt):
-        if self._frame >= self._max_frames:
-            self._frame = 1
-            if self.max_loops > 0:
-                self._current_loop += 1
+        self._time += dt
+        if self._time > self._rate:
+            self._time -= self._rate
+
+            if self._frame >= self._max_frames:
+                self._frame = 1
+                if self.max_loops > 0:
+                    self._current_loop += 1
+            else:
+                self._frame += 1
+
+            self.texture = self._sprite_map[f'{self.animation}_{self._frame}']
+
+            if self.max_loops > 0 and self._current_loop >= self.max_loops:
+                return False
         else:
-            self._frame += 1
-
-        self.texture = self._sprite_map[f'{self.animation}_{self._frame}']
-
-        if self.max_loops > 0 and self._current_loop >= self.max_loops:
-            return False
+            log.debug(f'ANIMATED SPRITE: SKIPPED @ DELTA {self._time}')
 
     def _flip_textures(self, direction):
-        was_started = True if self._started else False
-        if was_started:
-            self.stop()
-
         attr = f'flip_{direction}'
         for _, v in self._sprite_map.textures.items():
             getattr(v, attr)()
-
-        if was_started:
-            self.play()
