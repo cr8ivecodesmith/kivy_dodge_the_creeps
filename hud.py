@@ -40,6 +40,10 @@ class Hud(BoxLayout):
             self.is_game_over = False
             self.show_title_message()
 
+    def press_start(self, *args):
+        if self.parent.ids['keyboard'].is_key_pressed('enter'):
+            self.handle_start_button()
+
     def handle_start_button(self, *args):
         btn = self.ids['start_button']
         if btn.visible:
