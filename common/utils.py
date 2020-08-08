@@ -1,7 +1,6 @@
 __all__ = (
     'dist',
     'clamp',
-    'frame_offset',
     'Profiler',
 )
 
@@ -16,8 +15,6 @@ except ImportError:
     def dist(p, q):
         return sqrt(sum((px - qx) ** 2.0 for px, qx in zip(p, q)))
 
-from kivy.clock import Clock
-
 
 def clamp(val, lower, upper):
     if val >= lower and val <= upper:
@@ -26,13 +23,6 @@ def clamp(val, lower, upper):
         return lower
     elif val > upper:
         return upper
-
-
-def frame_offset():
-    """Returns the last frame tick in seconds
-
-    """
-    return Clock.get_time() * 0.000001
 
 
 class Profiler:
