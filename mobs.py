@@ -11,4 +11,6 @@ class DodgeMobs(Widget):
 
     def generate(self):
         mob = DodgeMob()
+        if hasattr(mob, 'initialize'):
+            mob.initialize()
         return mob

@@ -17,10 +17,6 @@ class DodgeGame(FloatLayout):
 
     score = NumericProperty(0)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self._moving = False
-
     def set_player_start(self):
         window = self.get_root_window()
         w, h = window.size
