@@ -60,10 +60,11 @@ class DodgePlayer(Node):
 
     def on_hit(self): pass
 
+    def initialize(self, *args):
+        self.parent.ids['collision_system'].register(self)
+
     def handle_body_entered(self, *args):
-        log.debug(f'PLAYER: I am hit! {args}')
         self.dispatch('on_hit')
-        return True
 
     def on_key_release(self):
         sprite = self.ids['sprite']

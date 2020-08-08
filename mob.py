@@ -11,6 +11,7 @@ class DodgeMob(Node):
 
     min_speed = NumericProperty(150)
     max_speed = NumericProperty(350)
+    speed = NumericProperty(0)
 
     def _get_sprite(self):
         return self.ids.get('sprite')
@@ -24,7 +25,6 @@ class DodgeMob(Node):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.speed = randint(self.min_speed, self.max_speed)
         self.bind(
             min_speed=self.handle_speed,
             max_speed=self.handle_speed,

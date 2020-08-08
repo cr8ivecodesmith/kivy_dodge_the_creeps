@@ -1,0 +1,59 @@
+#:import Timer common.timer.Timer
+
+<Hud>:
+    orientation: 'vertical'
+
+    AnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'top'
+
+        Label:
+            id: score_label
+            text: '0'
+            font_size: '64sp'
+            font_name: 'dodge_assets/fonts/Xolonium-Regular.ttf'
+            valign: 'middle'
+            halign: 'center'
+            size_hint_y: .6
+
+    AnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'center'
+        size_hint_y: 1.4
+
+        Label:
+            id: message
+            visible: True
+            opacity: 1 if self.visible else 0
+            disabled: not self.visible
+
+            text: 'Dodge the\nCreeps!'
+            font_size: '64sp'
+            font_name: 'dodge_assets/fonts/Xolonium-Regular.ttf'
+            valign: 'middle'
+            halign: 'center'
+
+    AnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'bottom'
+
+        Button:
+            id: start_button
+            visible: True
+            opacity: 1 if self.visible else 0
+            disabled: not self.visible
+
+            text: 'Start'
+            font_size: '64sp'
+            font_name: 'dodge_assets/fonts/Xolonium-Regular.ttf'
+            valign: 'middle'
+            halign: 'center'
+            size_hint: .38, .65
+
+            on_press: self.parent.parent.handle_start_button(*args)
+
+    Timer:
+        id: message_timer
+        delay: 2
+        oneshot: True
+        on_timeout: self.parent.message_timer_timeout(self.delta)

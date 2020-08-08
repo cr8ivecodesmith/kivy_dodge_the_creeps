@@ -2,9 +2,11 @@
 
 #:include player.kv
 #:include mob.kv
+#:include hud.kv
 
 #:import DodgeGame game.DodgeGame
 #:import DodgeMobs mobs.DodgeMobs
+#:import Hud hud.Hud
 
 #:import CollisionSystem common.collision.CollisionSystem
 #:import Keyboard common.keyboard.Keyboard
@@ -14,10 +16,46 @@
 
 <DodgeGame>:
 
+    # ============
+    # INITIALIZERS
+    # ============
+    # Nodes or Systems with `initialize` methods that needs to run once.
+
+    on_kv_post: player.initialize(*args)
+
+    # ========
+    # GAMELOOP
+    # ========
+    # Nodes or Systems with `process` methods that needs to run on every frame.
+
+    Timer:
+        id: processor
+        delay: 1 / 60
+        autoplay: True
+        on_timeout: player.process(self.delta)
+        on_timeout: mob_path.process(self.delta)
+        on_timeout: collision_system.process(self.delta)
+
+    # ============
+    # GAME SYSTEMS
+    # ============
+    # General systems
+
+    CollisionSystem:
+        id: collision_system
+
+    # ==========
+    # MAIN NODES
+    # ==========
+    # Nodes attached to the game root.
+
+    Hud:
+        id: hud
+        on_start_game: self.parent.new_game()
+
     DodgePlayer:
         id: player
-        visible: True
-        pos: root.width / 2 - 30, root.height / 2 - 30
+        visible: False
         speed: 420
         on_body_entered: self.handle_body_entered(*args)
         on_hit: self.parent.game_over()
@@ -48,29 +86,6 @@
         id: mob_timer
         delay: 0.5
         on_timeout: self.parent.mob_timer_timeout()
-
-    # ============
-    # GAME SYSTEMS
-    # ============
-    # General systems
-
-    CollisionSystem:
-        id: collision_system
-
-    # ==============
-    # GAMELOOP TIMER
-    # ==============
-    # Timers to centralize data processors.
-    # Nodes or Systems with `process` methods that needs to be ran on every
-    # frame must bind to this timer.
-
-    Timer:
-        id: processor
-        delay: 1 / 60
-        autoplay: True
-        on_timeout: player.process(self.delta)
-        on_timeout: mob_path.process(self.delta)
-        on_timeout: collision_system.process(self.delta)
 
     RuntimeStats:
         show: True

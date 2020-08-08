@@ -28,6 +28,6 @@ class Node(Widget):
         pass
 
     def _handle_visible(self, this, value):
-        self.size_hint_x = 1 if value else 0
-        self.opacity = 1 if value else 0
-        self.disabled = not value
+        # self.size_hint_x = 1 if value else 0
+        self.opacity = 1 if self.visible else 0
+        self.disabled = not self.visible
