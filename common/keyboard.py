@@ -11,7 +11,7 @@ class Keyboard(Widget):
         super().__init__(**kwargs)
 
         self.register_event_type('on_key_press')
-        self.register_event_type('on_key_hold')
+        self.register_event_type('on_key_down')
         self.register_event_type('on_key_release')
 
         self._keyboard = Window.request_keyboard(
@@ -29,17 +29,26 @@ class Keyboard(Widget):
         self.keycode = None
         self.modifiers = None
 
-        self._prev_key_str = None
         self._kb_reference = None
+
+        self._keys_pressed = set()
+        self._keys_down = set()
 
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down=self._on_keyboard_down)
         self._keyboard = None
 
     def _on_keyboard_up(self, keyboard, keycode):
-        self._prev_key_str = None
         self._kb_reference = keyboard
         self.keycode = keycode
+
+        key = keycode[1]
+
+        if key in self._keys_pressed:
+            self._keys_pressed.remove(key)
+        if key in self._keys_down:
+            self._keys_down.remove(key)
+
         self.dispatch('on_key_release')
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
@@ -47,14 +56,27 @@ class Keyboard(Widget):
         self.keycode = keycode
         self.modifiers = modifiers
 
-        key_str = keycode[1]
-        if self._prev_key_str == key_str:
-            self.dispatch('on_key_hold')
+        key = keycode[1]
+
+        if key in self._keys_pressed:
+            self._keys_pressed.remove(key)
+            self._keys_down.add(key)
+            self.dispatch('on_key_down')
         else:
-            self._prev_key_str = key_str
+            self._keys_pressed.add(key)
             self.dispatch('on_key_press')
 
         return True
+
+    def is_key_pressed(self, key):
+        if isinstance(key, str):
+            key = (key,)
+        return True if set(key) & self._keys_pressed else False
+
+    def is_key_down(self, key):
+        if isinstance(key, str):
+            key = (key,)
+        return True if set(key) & self._keys_down else False
 
     def release(self):
         if self._kb_reference:
@@ -62,6 +84,6 @@ class Keyboard(Widget):
 
     def on_key_press(self): pass
 
-    def on_key_hold(self): pass
+    def on_key_down(self): pass
 
     def on_key_release(self): pass
