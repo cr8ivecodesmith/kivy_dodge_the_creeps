@@ -1,11 +1,12 @@
+"""
+Keyboard Component
+
+"""
 from kivy.core.window import Window
 from kivy.uix.widget import Widget
 
 
 class Keyboard(Widget):
-    """Keyboard System
-
-    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -14,8 +15,15 @@ class Keyboard(Widget):
         self.register_event_type('on_key_down')
         self.register_event_type('on_key_release')
 
+        self._is_attached = False
+        self.attach()
+
+    def attach(self):
+        if self._is_attached:
+            return
+
         self._keyboard = Window.request_keyboard(
-            self._keyboard_closed, self, 'text'
+            self.detach, self, 'text'
         )
 
         if self._keyboard.widget:
@@ -33,10 +41,18 @@ class Keyboard(Widget):
 
         self._keys_pressed = set()
         self._keys_down = set()
+        self._is_attached = True
 
-    def _keyboard_closed(self):
-        self._keyboard.unbind(on_key_down=self._on_keyboard_down)
+    def detach(self):
+        if not self._is_attached:
+            return
+
+        self._keyboard.unbind(
+            on_key_down=self._on_keyboard_down,
+            on_key_up=self._on_keyboard_up,
+        )
         self._keyboard = None
+        self._is_attached = False
 
     def _on_keyboard_up(self, keyboard, keycode):
         self._kb_reference = keyboard
