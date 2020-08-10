@@ -19,8 +19,7 @@ from game import DodgeGame
 class DodgeApp(App):
 
     def build(self):
-        self._game = DodgeGame()
-        return self._game
+        return DodgeGame()
 
     def on_start(self):
         pass

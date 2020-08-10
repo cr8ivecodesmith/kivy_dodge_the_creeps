@@ -7,6 +7,7 @@ if __name__ == '__main__':
 
     Config.set('graphics', 'width', 500)
     Config.set('graphics', 'height', 700)
+    Config.set('graphics', 'maxfps', '30')
     Config.set('kivy', 'log_level', 'info')
 
     Clock.max_iteration = 5  # Iterations before the next frame
