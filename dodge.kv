@@ -48,6 +48,8 @@
 
     DodgeMobs:
         id: mobs
+        min_speed: 100
+        max_speed: 250
         on_node_add: collision_system.register(args[1])
         on_node_add: mob_path.register(args[1])
         on_node_remove: collision_system.unregister(args[1])

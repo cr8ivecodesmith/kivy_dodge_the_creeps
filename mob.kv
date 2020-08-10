@@ -1,14 +1,12 @@
 #:include common/sprite.kv
 
 #:import choice random.choice
-#:import randint random.randint
 #:import DodgeMob mob.DodgeMob
 #:import AnimatedSprite common.sprite.AnimatedSprite
 
 <DodgeMob>:
 
     neutral_groups: ('mobs',)
-    speed: randint(self.min_speed, self.max_speed)
 
     AnimatedSprite:
         id: sprite

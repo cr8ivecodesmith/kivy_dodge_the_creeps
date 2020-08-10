@@ -5,7 +5,6 @@ from kivy.vector import Vector
 
 class Path2D(Widget):
 
-    spawn_location = None
     targets = set()
 
     def __init__(self, **kwargs):
@@ -23,8 +22,6 @@ class Path2D(Widget):
             self.targets.remove(target)
 
     def process(self, delta):
-        # TODO: Update targets position
-        # targets must have a linear_velocity and direction properties?
         self._time += delta
         if self._time > self._rate:
             self._time -= self._rate
@@ -35,12 +32,11 @@ class Path2D(Widget):
                 if not target.visible:
                     continue
 
-                x, y = target.center
-                if (x < 0 or x > w) or (y < 0 or y > h):
-                    # TODO: Trigger removal / hide event
-                    target.visible = False
-                    continue
-                spd = Vector(target.speed, target.speed) * delta
+                # Determine movement based on angle and spawn location
+                spd = (
+                    (Vector(target.speed, target.speed) * target.direction)
+                ) * delta
+
                 target.pos = Vector(*target.pos) + spd
 
         else:

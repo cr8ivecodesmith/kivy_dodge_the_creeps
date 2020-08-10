@@ -1,5 +1,3 @@
-from random import randint
-
 from kivy.properties import (
     AliasProperty,
     NumericProperty,
@@ -12,7 +10,6 @@ class DodgeMob(Node):
 
     min_speed = NumericProperty(150)
     max_speed = NumericProperty(350)
-    speed = NumericProperty(0)
 
     def _get_size(self): return self.sprite.size
 
@@ -22,13 +19,8 @@ class DodgeMob(Node):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.bind(
-            min_speed=self.handle_speed,
-            max_speed=self.handle_speed,
-        )
-
-    def handle_speed(self, *args):
-        self.speed = randint(self.min_speed, self.max_speed)
+        self.speed = None
+        self.direction = None
 
     def initialize(self):
         super().initialize()

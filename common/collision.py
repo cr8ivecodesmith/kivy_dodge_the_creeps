@@ -49,7 +49,8 @@ class CollisionSystem(Widget):
                     continue
 
                 # TODO: Get target collision shapes if it exists
-                if a.collide_widget(b):
+                # For now, we'll base it off of the sprite's size
+                if a.sprite.collide_widget(b.sprite):
                     a.dispatch('on_body_entered', b)
                     b.dispatch('on_body_entered', a)
         else:

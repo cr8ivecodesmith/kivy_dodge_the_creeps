@@ -3,10 +3,11 @@ The Game Screen
 
 
 """
-from random import randint
+from random import randint, choice
 
 from kivy.uix.floatlayout import FloatLayout
 from kivy.logger import Logger as log
+from kivy.vector import Vector
 
 from kivy.properties import (
     NumericProperty,
@@ -73,13 +74,69 @@ class DodgeGame(FloatLayout):
         mobs = self.ids['mobs']
         mob = mobs.generate()
 
-        # TODO: Set spawn location, velocity, and direction
+        # Choose a spawn point within the window borders
         window = self.get_root_window()
-        mob.pos = (
-            randint(0, window.width),
-            randint(0, window.height)
+        w, h = window.size
+        borders = {
+            'left': ((0, h), (0, 0)),  # left
+            'right': ((w, 0), (w, h)),  # right
+            'top': ((w, h), (0, h)),  # top
+            'bottom': ((0, 0,), (w, 0)),  # bot
+        }
+        bkey = choice(tuple(borders.keys()))
+        p1, p2 = borders[bkey]
+        px = (p1[0], p2[0],)
+        py = (p1[1], p2[1],)
+        pos = (
+            randint(min(px), max(px)),
+            randint(min(py), max(py))
         )
-        mob.sprite.angle = randint(0, 90)
+
+        # Determine the direction based on pos and angle
+        direction = Vector(0, 0)
+        if pos[1] >= h / 2:
+            direction.y -= 1
+        else:
+            direction.y += 1
+        if pos[0] >= w / 2:
+            direction.x -= 1
+        else:
+            direction.x += 1
+
+        # Depending on the spawn point and direction, determin an angle
+        # By default, the sprite is facing to the right
+        x, y = pos
+        if bkey == 'left':
+            angle = 0
+            if y > h / 2:  # top
+                angle += randint(-20, 0)
+            else:
+                angle += randint(0, 20)
+        if bkey == 'right':
+            angle = 180
+            if y > h / 2:  # top
+                angle += randint(-20, 0)
+            else:
+                angle += randint(0, 20)
+        if bkey == 'top':
+            angle = -90
+            if x < w / 2:  # left
+                angle += randint(0, 20)
+            else:
+                angle += randint(-20, 0)
+        if bkey == 'bottom':
+            angle = 90
+            if x < w / 2:  # left
+                angle += randint(-20, 0)
+            else:
+                angle += randint(0, 20)
+
+        # Determine the speed
+        speed = randint(mob.min_speed, mob.max_speed)
 
         # Register the mob node
+        mob.speed = speed
+        mob.direction = direction
+        mob.pos = pos
+        mob.sprite.angle = angle
         mobs.add_widget(mob)
