@@ -20,7 +20,7 @@ NOTES
   directly to the Window
 
 """  # noqa
-from kivy.logger import Logger as log
+from kivy.logger import Logger as log  # noqa
 from kivy.properties import (
     AliasProperty,
     NumericProperty,
@@ -60,22 +60,8 @@ class DodgePlayer(Node):
 
     def on_hit(self): pass
 
-    def initialize(self, *args):
-        self.parent.ids['collision_system'].register(self)
-
-    def handle_body_entered(self, *args):
+    def handle_body_entered(self, other):
         self.dispatch('on_hit')
-
-    def on_key_release(self):
-        sprite = self.ids['sprite']
-        sprite.stop()
-
-    def on_key_press(self):
-        kb = self.keyboard
-        if kb.is_key_pressed('escape'):
-            log.debug('KEYBOARD: Released')
-            kb.release()
-            log.info('KEYBOARD: Press ESC again to exit')
 
     def get_velocity(self):
         velocity = Vector(0, 0)
@@ -105,6 +91,8 @@ class DodgePlayer(Node):
             # Play animation
             velocity = velocity.normalize() * self.speed
             sprite.play()
+        else:
+            sprite.stop()
 
         new_pos = Vector(self.pos) + velocity * delta
         self.pos = (
