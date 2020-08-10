@@ -1,24 +1,6 @@
 """
 Player
 
-TODO
-----
-
-- Handle touch-based movement properly
-
-
-References
-----------
-
-- https://kivy.org/doc/stable/api-kivy.core.window.html#kivy.core.window.Keyboard
-
-NOTES
------
-
-- Binds the window keyboard events
-- on_key_down event must return True otherwise the event is propagated
-  directly to the Window
-
 """  # noqa
 from kivy.logger import Logger as log  # noqa
 from kivy.properties import (
@@ -34,14 +16,6 @@ from common.utils import clamp
 class DodgePlayer(Node):
 
     speed = NumericProperty(20)
-
-    def _get_sprite(self): return self.ids.get('sprite')
-
-    sprite = AliasProperty(_get_sprite, None)
-
-    def _get_kb(self): return self.parent.ids['keyboard']
-
-    keyboard = AliasProperty(_get_kb, None)
 
     def _get_size(self): return self.sprite.size
 
@@ -60,12 +34,16 @@ class DodgePlayer(Node):
 
     def on_hit(self): pass
 
+    def initialize(self):
+        super().initialize()
+        self.sprite = self.ids['sprite']
+
     def handle_body_entered(self, other):
         self.dispatch('on_hit')
 
     def get_velocity(self):
         velocity = Vector(0, 0)
-        kb = self.keyboard
+        kb = self.root_node.ids['keyboard']
         if kb.is_key_pressed(self.up_keys) or kb.is_key_down(self.up_keys):
             velocity.y += 1
         if kb.is_key_pressed(self.down_keys) or kb.is_key_down(self.down_keys):
@@ -84,7 +62,7 @@ class DodgePlayer(Node):
             return
 
         # Process movement
-        sprite = self.sprite
+        sprite = self.ids['sprite']
         velocity = self.get_velocity()
 
         if velocity.length() > 0:

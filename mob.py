@@ -14,10 +14,6 @@ class DodgeMob(Node):
     max_speed = NumericProperty(350)
     speed = NumericProperty(0)
 
-    def _get_sprite(self):
-        return self.ids.get('sprite')
-    sprite = AliasProperty(_get_sprite, None)
-
     def _get_size(self): return self.sprite.size
 
     def _set_size(self, val): pass
@@ -33,3 +29,7 @@ class DodgeMob(Node):
 
     def handle_speed(self, *args):
         self.speed = randint(self.min_speed, self.max_speed)
+
+    def initialize(self):
+        super().initialize()
+        self.sprite = self.ids['sprite']
