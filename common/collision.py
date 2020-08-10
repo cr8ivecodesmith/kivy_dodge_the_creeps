@@ -33,7 +33,8 @@ class CollisionSystem(Widget):
         self.targets.add(target)
 
     def unregister(self, target):
-        self.targets.remove(target)
+        if target in self.targets:
+            self.targets.remove(target)
 
     def process(self, delta):
         self._time += delta

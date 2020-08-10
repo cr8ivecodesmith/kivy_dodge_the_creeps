@@ -19,18 +19,18 @@ class Path2D(Widget):
         self.targets.add(target)
 
     def unregister(self, target):
-        self.targets.remove(target)
+        if target in self.targets:
+            self.targets.remove(target)
 
     def process(self, delta):
         # TODO: Update targets position
-        # targets must have a linear_velocity and direction properties
+        # targets must have a linear_velocity and direction properties?
         self._time += delta
         if self._time > self._rate:
             self._time -= self._rate
 
             window = self.get_root_window()
             w, h = window.size
-
             for target in self.targets:
                 if not target.visible:
                     continue
@@ -42,5 +42,6 @@ class Path2D(Widget):
                     continue
                 spd = Vector(target.speed, target.speed) * delta
                 target.pos = Vector(*target.pos) + spd
+
         else:
             log.debug(f'PATH MOVEMENT: SKIPPED @ DELTA {self._time}')
