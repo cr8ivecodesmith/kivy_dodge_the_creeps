@@ -2,15 +2,16 @@
 Mobs Generator
 
 """
-from kivy.uix.widget import Widget
+from kivy.logger import Logger as log  # noqa
+
+from common.node import Node
 
 from mob import DodgeMob
 
 
-class DodgeMobs(Widget):
+class DodgeMobs(Node):
 
     def generate(self):
         mob = DodgeMob()
-        if hasattr(mob, 'initialize'):
-            mob.initialize()
+        self.add_widget(mob)
         return mob
