@@ -13,5 +13,4 @@ class DodgeMobs(Node):
 
     def generate(self):
         mob = DodgeMob()
-        self.add_widget(mob)
         return mob

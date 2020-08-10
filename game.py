@@ -69,11 +69,17 @@ class DodgeGame(FloatLayout):
     def mob_timer_timeout(self):
         if not self.ids['player'].visible:
             return
-        window = self.get_root_window()
+
         mobs = self.ids['mobs']
         mob = mobs.generate()
+
+        # TODO: Set spawn location, velocity, and direction
+        window = self.get_root_window()
         mob.pos = (
             randint(0, window.width),
             randint(0, window.height)
         )
         mob.sprite.angle = randint(0, 90)
+
+        # Register the mob node
+        mobs.add_widget(mob)
