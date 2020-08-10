@@ -8,6 +8,7 @@
 #:import DodgeMobs mobs.DodgeMobs
 #:import Hud hud.Hud
 
+#:import Audio common.audio.Audio
 #:import CollisionSystem common.collision.CollisionSystem
 #:import Keyboard common.keyboard.Keyboard
 #:import Path2D common.path2d.Path2D
@@ -42,9 +43,14 @@
     # ==========
     # Nodes attached to the game root.
 
-    Hud:
-        id: hud
-        on_start_game: self.parent.new_game()
+    Widget:
+        id: background_color
+        canvas.before:
+            Color:
+                rgba: .2, 0, 0, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
 
     DodgeMobs:
         id: mobs
@@ -65,11 +71,21 @@
         on_initialize: collision_system.register(self)
         on_body_entered: self.handle_body_entered(args[1])
         on_hit: self.parent.game_over()
+        on_hit: music_game_over.play()
+        on_hit: music_bg.stop()
 
-    Keyboard:
-        id: keyboard
-        on_key_press: self.parent.exit_game()
-        on_key_press: hud.press_start()
+    Hud:
+        id: hud
+        on_start_game: self.parent.new_game()
+        on_start_game: music_bg.play()
+
+    Audio:
+        id: music_bg
+        source: 'dodge_assets/art/House In a Forest Loop.ogg'
+
+    Audio:
+        id: music_game_over
+        source: 'dodge_assets/art/gameover.wav'
 
     Timer:
         id: start_timer
@@ -86,6 +102,11 @@
         id: mob_timer
         delay: 0.5
         on_timeout: self.parent.mob_timer_timeout()
+
+    Keyboard:
+        id: keyboard
+        on_key_press: self.parent.exit_game()
+        on_key_press: hud.press_start()
 
     RuntimeStats:
         show: True

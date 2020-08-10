@@ -20,16 +20,23 @@ class Timer(Widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.register_event_type('on_timeout')
-        self.bind(autoplay=self.start)
+        self.bind(
+            oneshot=self.handle_oneshot,
+            autoplay=self.start,
+        )
 
         self._clock = None
-        self._scheduler = getattr(
-            Clock, 'schedule_once' if self.oneshot else 'schedule_interval'
-        )
+        self._scheduler = Clock.schedule_interval
         self.delta = 0.
 
-    def on_timeout(self):
-        pass
+    def on_timeout(self): pass
+
+    def handle_oneshot(self, this, value):
+        if self._clock and self._clock.is_triggered:
+            self._clock.stop()
+        self._scheduler = getattr(
+            Clock, 'schedule_once' if value else 'schedule_interval'
+        )
 
     def start(self, *args):
         if self._clock and self._clock.is_triggered:

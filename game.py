@@ -65,7 +65,6 @@ class DodgeGame(FloatLayout):
             return
         self.score += 1
         self.ids['hud'].update_score(self.score)
-        log.debug(f'SCORE: {self.score}')
 
     def mob_timer_timeout(self):
         if not self.ids['player'].visible:
@@ -103,8 +102,10 @@ class DodgeGame(FloatLayout):
         else:
             direction.x += 1
 
-        # Depending on the spawn point and direction, determin an angle
-        # By default, the sprite is facing to the right
+        # Depending on the spawn point and direction, determine the angle.
+        # By default, the sprite is facing to the right.
+        # NOTE: Angle should be based on position and direction but for now,
+        # we'll just randomize it.
         x, y = pos
         if bkey == 'left':
             angle = 0
