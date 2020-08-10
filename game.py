@@ -17,6 +17,13 @@ class DodgeGame(FloatLayout):
 
     score = NumericProperty(0)
 
+    def exit_game(self):
+        kb = self.ids['keyboard']
+        if kb.is_key_pressed('escape'):
+            log.debug('KEYBOARD: Released')
+            kb.release()
+            log.info('KEYBOARD: Press ESC again to exit')
+
     def set_player_start(self):
         window = self.get_root_window()
         w, h = window.size
@@ -46,8 +53,6 @@ class DodgeGame(FloatLayout):
 
         # Remove all mobs
         mobs = self.ids['mobs']
-        collision = self.ids['collision_system']
-        collision.targets = collision.targets - set(mobs.children)
         mobs.clear_widgets()
 
     def start_timer_timeout(self):
@@ -64,22 +69,11 @@ class DodgeGame(FloatLayout):
     def mob_timer_timeout(self):
         if not self.ids['player'].visible:
             return
-
         window = self.get_root_window()
         mobs = self.ids['mobs']
-        path = self.ids['mob_path']
-        collision = self.ids['collision_system']
-
         mob = mobs.generate()
         mob.pos = (
             randint(0, window.width),
             randint(0, window.height)
         )
         mob.sprite.angle = randint(0, 90)
-        mobs.add_widget(mob)
-
-        # Register to game systems
-        path.register(mob)
-        collision.register(mob)
-
-        log.debug(f'TOTAL MOBS: {len(mobs.children)}')

@@ -16,13 +16,6 @@
 
 <DodgeGame>:
 
-    # ============
-    # INITIALIZERS
-    # ============
-    # Nodes or Systems with `initialize` methods that needs to run once.
-
-    on_kv_post: player.initialize(*args)
-
     # ========
     # GAMELOOP
     # ========
@@ -53,23 +46,27 @@
         id: hud
         on_start_game: self.parent.new_game()
 
-    DodgePlayer:
-        id: player
-        visible: False
-        speed: 420
-        on_body_entered: self.handle_body_entered(*args)
-        on_hit: self.parent.game_over()
-
     DodgeMobs:
         id: mobs
+        on_node_add: collision_system.register(args[1])
+        on_node_add: mob_path.register(args[1])
+        on_node_remove: collision_system.unregister(args[1])
+        on_node_remove: mob_path.unregister(args[1])
 
     Path2D:
         id: mob_path
 
+    DodgePlayer:
+        id: player
+        visible: False
+        speed: 420
+        on_initialize: collision_system.register(self)
+        on_body_entered: self.handle_body_entered(args[1])
+        on_hit: self.parent.game_over()
+
     Keyboard:
         id: keyboard
-        on_key_release: player.on_key_release()
-        on_key_press: player.on_key_press()
+        on_key_press: self.parent.exit_game()
         on_key_press: hud.press_start()
 
     Timer:
