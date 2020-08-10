@@ -187,11 +187,10 @@ class AnimatedSprite(Sprite):
         if self._clock and self._clock.is_triggered:
             return
         if not self._clock:
-            self._clock = Clock.schedule_interval(
+            self._clock = Clock.create_trigger(
                 self._animate, self._animation_speed
             )
-        else:
-            self._clock()
+        self._clock()
 
     def stop(self):
         if self._clock:
@@ -215,6 +214,7 @@ class AnimatedSprite(Sprite):
                 return False
         else:
             log.debug(f'ANIMATED SPRITE: SKIPPED @ DELTA {self._time}')
+        self._clock()
 
     def _flip_textures(self, direction):
         attr = f'flip_{direction}'

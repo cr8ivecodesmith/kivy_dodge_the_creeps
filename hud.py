@@ -29,7 +29,7 @@ class Hud(BoxLayout):
         label = self.ids['message']
         label.text = 'Dodge the\nCreeps!'
         label.visible = True
-        Clock.schedule_once(self.show_title_timer_timeout, 1)
+        Clock.create_trigger(self.show_title_timer_timeout, 1)()
 
     def update_score(self, score):
         self.ids['score_label'].text = str(score)
